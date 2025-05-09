@@ -1,32 +1,23 @@
 name: Import SQL into MySQL
 
-on:
+on:               # <-- clé racine sans guillemets, sans indentation
   push:
     paths:
-      - 'scripts/**/*.sql'     # déclenche seulement si un .sql change
-  workflow_dispatch:          # bouton manuel "Run workflow"
+      - 'scripts/**/*.sql'
+  workflow_dispatch:
 
 jobs:
   import-db:
-    # runner GitHub hébergé ou self-hosted si vous en avez installé un
-    runs-on: ${{ contains(runner.labels, 'self-hosted') && 'self-hosted' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ----- client MySQL, selon l’OS du runner ------------------------
-      - name: Install MySQL client (Ubuntu only)
-        if: runner.os == 'Linux'
+      - name: Install MySQL client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
-      - name: Add XAMPP mysql.exe to PATH (Windows self-hosted)
-        if: runner.os == 'Windows'
-        run: echo "C:\\xampp\\mysql\\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        shell: pwsh
-      # -----------------------------------------------------------------
-
-      - name: Import every .sql file from /scripts
+      - name: Import SQL files
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
@@ -34,14 +25,13 @@ jobs:
           DB_PASS: ${{ secrets.DB_PASS }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
-          echo "🔍 Found SQL files:"
           shopt -s globstar nullglob
           for file in scripts/**/*.sql; do
-            echo "⏳  Importing $file"
+            echo "⏳ Importing $file"
             mysql --host="$DB_HOST" --port="$DB_PORT" \
                   --user="$DB_USER" --password="$DB_PASS" \
                   "$DB_NAME" < "$file"
           done
-          echo "✅  Import completed."
-        shell: bash
+          echo "✅ Import finished"
+
 
