@@ -1,25 +1,20 @@
-# .github/workflows/db-import.yml
+---
 name: Import SQL into MySQL
-
 on:
   push:
     paths:
-      - 'scripts/**/*.sql'
-  workflow_dispatch:
-
+      - scripts/**/*.sql
+  workflow_dispatch: null
 jobs:
   import-db:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Install MySQL client
-        run:
+        run: >
           sudo apt-get update
           sudo apt-get install -y mysql-client     # <- on passe en bloc, plus de ‘&&’
-
       - name: Import SQL files
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
