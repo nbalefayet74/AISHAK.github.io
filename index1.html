@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>annuler Covoiturage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color:rgb(69, 191, 12);
+        }
+        .cancel button{
+            display: block;
+            width: 10%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <br>
+<form action="annuler_covoiturage.php" method="post">
+        <input type="hidden" name="id_covoiturage" value="35"> 
+        <div class="cancel">
+        <button type="submit">Annuler Covoiturage</button>
+        </div>
+    </form>
+</body>
+</html>
