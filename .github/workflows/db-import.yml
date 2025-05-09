@@ -25,13 +25,14 @@ jobs:
           DB_PASS: ${{ secrets.DB_PASS }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
+          echo "🔍 Recherche de dumps SQL dans scripts/ …"
           shopt -s globstar nullglob
           for file in scripts/**/*.sql; do
-            echo "⏳ Importing $file"
+            echo "⏳  Importing $file"
             mysql --host="$DB_HOST" --port="$DB_PORT" \
-                  --user="$DB_USER" --password="$DB_PASS" \
-                  "$DB_NAME" < "$file"
-          done
-          echo "✅ Import finished"
+            --user="$DB_USER" --password="$DB_PASS" \
+            "$DB_NAME" < "$file"
+         done
+         echo "✅  Import finished"
 
 
