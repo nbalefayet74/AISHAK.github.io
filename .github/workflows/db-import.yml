@@ -1,3 +1,4 @@
+# .github/workflows/db-import.yml
 name: Import SQL into MySQL
 
 on:
@@ -15,7 +16,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install MySQL client
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client     # <- on passe en bloc, plus de ‘&&’
 
       - name: Import SQL files
         env:
@@ -25,18 +28,12 @@ jobs:
           DB_PASS: ${{ secrets.DB_PASS }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
-          echo "🔍 Recherche de dumps SQL dans scripts/"
+          echo "🔍  Recherche de dumps SQL dans scripts/ …"
           shopt -s globstar nullglob
           for file in scripts/**/*.sql; do
-            echo "⏳  Importing $file"
+            echo "  📥  Importing $file"
             mysql --host="$DB_HOST" --port="$DB_PORT" \
                   --user="$DB_USER" --password="$DB_PASS" \
                   "$DB_NAME" < "$file"
           done
           echo "✅  Import finished"
-
-
-
-
-
-
