@@ -1,8 +1,0 @@
-return [
-    'GET /login'           => 'AuthController@loginForm',
-    'POST /login'          => 'AuthController@login',
-    'GET /rides'           => 'RideController@index',
-    'POST /rides'          => 'RideController@store',
-    'GET /rides/{id}'      => 'RideController@show',
-    'POST /reviews'        => 'ReviewController@store',
-];
