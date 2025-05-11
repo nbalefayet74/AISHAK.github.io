@@ -1,0 +1,86 @@
+<?php
+/**
+ *  src/Bootstrap.php
+ *  ------------------------------------------------------------------
+ *  Point d’entrée “bas‑niveau” de l’application :
+ *   1. Charge l’autoload Composer
+ *   2. Lit les variables d’environnement depuis .env (si présent)
+ *   3. Charge les fichiers de configuration (app, constantes, DB, services…)
+ *   4. Configure un gestionnaire d’erreurs joli en mode debug
+ *   5. Démarre la session (si nécessaire) et l’output buffering
+ *  ------------------------------------------------------------------
+ *  Dépendances facultatives :
+ *      ├── vlucas/phpdotenv   (composer require vlucas/phpdotenv)
+ *      └── filp/whoops        (composer require filp/whoops)
+ */
+
+declare(strict_types=1);
+
+namespace App;
+
+use Dotenv\Dotenv;
+use Whoops\Run            as WhoopsRun;
+use Whoops\Handler\PrettyPageHandler;
+
+final class Bootstrap
+{
+    /** Lance toutes les étapes d’initialisation */
+    public static function init(): void
+    {
+        /*--------------------------------------------------------------
+        | 1. Autoload Composer
+        --------------------------------------------------------------*/
+        $root = dirname(__DIR__);                      // racine du projet
+        require_once $root . '/vendor/autoload.php';
+
+        /*--------------------------------------------------------------
+        | 2. Variables d’environnement (.env)
+        --------------------------------------------------------------*/
+        if (file_exists($root . '/.env')) {
+            // Charge .env dans $_SERVER / $_ENV
+            $dotenv = Dotenv::createImmutable($root);
+            $dotenv->load();
+        }
+
+        /*--------------------------------------------------------------
+        | 3. Fichiers de configuration
+        --------------------------------------------------------------*/
+        require_once $root . '/config/app.php';        // fuseau, debug, etc.
+        require_once $root . '/config/constants.php';  // enums métiers
+        require_once $root . '/config/database.php';   // db() → PDO
+        require_once $root . '/config/services.php';   // logger(), cache()
+        // Optionnels :
+        // require_once $root . '/config/mailer.php';
+        // require_once $root . '/config/csrf.php';
+
+        /*--------------------------------------------------------------
+        | 4. Gestionnaire d’erreurs "Whoops" en mode debug
+        --------------------------------------------------------------*/
+        if (defined('APP_DEBUG') && APP_DEBUG && class_exists(WhoopsRun::class)) {
+            $whoops = new WhoopsRun();
+            $whoops->pushHandler(new PrettyPageHandler());
+            $whoops->register();
+        }
+
+        /*--------------------------------------------------------------
+        | 5. Session + Output Buffering
+        --------------------------------------------------------------*/
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!ob_get_level()) {
+            ob_start();
+        }
+
+        /*--------------------------------------------------------------
+        | 6. Encodage interne (UTF‑8) – bonne habitude
+        --------------------------------------------------------------*/
+        if (function_exists('mb_internal_encoding')) {
+            mb_internal_encoding('UTF-8');
+        }
+    }
+
+    /** Empêche l’instanciation de la classe */
+    private function __construct() {}
+}
